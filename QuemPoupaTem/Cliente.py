@@ -4,174 +4,177 @@ from typing import List, Union
 
 class Cliente:
     """
-    Classe que representa um cliente.
+    Classe que representa um cliente e contém métodos para manipulação de dados do cliente
     """
 
     def __init__(self, razao_social: str, cnpj: str, tipo_de_conta: str, saldo: float, senha: str):
-        self.razao_social = razao_social
-        self.cnpj = cnpj
-        self.tipo_de_conta = tipo_de_conta
-        self.saldo = saldo
-        self.senha = senha
-
+        self.razao_social = razao_social  # Razão social do cliente
+        self.cnpj = cnpj  # CNPJ do cliente
+        self.tipo_de_conta = tipo_de_conta  # Tipo de conta do cliente
+        self.saldo = saldo  # Saldo do cliente
+        self.senha = senha  # Senha do cliente
 
     def getTipoDeConta(self, arquivo) -> Union[str, bool]:
-        with open(arquivo, "r") as f:
-            lines = f.readlines()
 
-        for line in lines:
-            partes = line.split(";")
-            if partes[1] == self.cnpj:
-                return str(partes[2])
+        with open(arquivo, "r") as f:  # Abre o arquivo em modo leitura
+            lines = f.readlines()  # Pega todas as linhas do arquivo
+
+        for line in lines:  # Percorre as linhas do arquivo
+            partes = line.split(";")  # Divide as linhas em partes
+            if partes[1] == self.cnpj:  # Se o CNPJ da linha for igual ao do cliente
+                return str(partes[2])  # Retorna o tipo de conta
 
         return False
 
     def setSaldo(self, arquivo: str, saldo: float) -> bool:
-        # Abre o arquivo em modo leitura
-        with open(arquivo, "r") as f:
-            lines = f.readlines()
 
-        # Percorre as linhas do arquivo
-        for i, line in enumerate(lines):
-            partes = line.split(";")
-            if partes[1] == self.cnpj:
-                # Altera o saldo na linha correspondente
-                partes[3] = str(saldo)
-                lines[i] = ";".join(partes)
-                self.saldo = saldo
+        with open(arquivo, "r") as f:  # Abre o arquivo em modo leitura
+            lines = f.readlines()  # Pega todas as linhas do arquivo
 
-        # Abre o arquivo em modo escrita e reescreve as linhas com o saldo atualizado
-        with open(arquivo, "w") as f:
-            f.writelines(lines)
+        for i, line in enumerate(
+                lines):  # Percorre as linhas do arquivo, utiliza enumerate para pegar o indice da linha
+            partes = line.split(";")  # Divide as linhas em partes
+            if partes[1] == self.cnpj:  # Se o CNPJ da linha for igual ao do cliente
+                partes[3] = str(saldo)  # Atualiza o saldo do cliente
+                lines[i] = ";".join(partes)  # Reescreve a linha com o saldo atualizado
+                self.saldo = saldo  # Atualiza o saldo do cliente
 
-        return True if self.saldo == saldo else False
+        with open(arquivo, "w") as f:  # Abre o arquivo em modo escrita
+            f.writelines(lines)  # Reescreve as linhas com o saldo atualizado
+
+        return True if self.saldo == saldo else False  # Retorna True se o saldo for atualizado
 
     def getSaldo(self, arquivo: str) -> float:
-        with open(arquivo, "r") as f:
-            lines = f.readlines()
+        with open(arquivo, "r") as f:  # Abre o arquivo em modo leitura
+            lines = f.readlines()  # Pega todas as linhas do arquivo
 
-        for line in lines:
-            partes = line.split(";")
-            if partes[1] == self.cnpj:
-                return float(partes[3])
+        for line in lines:  # Percorre as linhas do arquivo
+            partes = line.split(";")  # Divide as linhas em partes
+            if partes[1] == self.cnpj:  # Se o CNPJ da linha for igual ao do cliente
+                return float(partes[3])  # Retorna o saldo do cliente
 
         return False
 
     def salvarCliente(self, arquivo: str):
-        with open(arquivo, "a") as f:
-            f.write(f"{self.razao_social};{self.cnpj};{self.tipo_de_conta};{self.saldo};{self.senha}\n")
+        with open(arquivo, "a") as f:  # Abre o arquivo em modo escrita
+            f.write(
+                f"{self.razao_social};{self.cnpj};{self.tipo_de_conta};{self.saldo};{self.senha}\n")  # Escreve o cliente no arquivo
 
     def removerCliente(self, arquivo: str):
-        with open(arquivo, "r") as f:
-            lines = f.readlines()
+        with open(arquivo, "r") as f:  # Abre o arquivo em modo leitura
+            lines = f.readlines()  # Pega todas as linhas do arquivo
 
-        with open(arquivo, "w") as f:
-            cliente_encontrado = False
-            for line in lines:
-                if line.split(";")[1] == self.cnpj:
-                    cliente_encontrado = True
-                    continue
-                f.write(line)
+        with open(arquivo, "w") as f:  # Abre o arquivo em modo escrita
+            cliente_encontrado = False  # Variável que indica se o cliente foi encontrado
+            for line in lines:  # Percorre as linhas do arquivo
+                if line.split(";")[1] == self.cnpj:  # Se o CNPJ da linha for igual ao do cliente
+                    cliente_encontrado = True  # Atualiza a variável indicando que o cliente foi encontrado
+                    continue  # Sai do laço
+                f.write(line)  # Escreve a linha no arquivo
 
-            if cliente_encontrado:
-                print("Cliente removido com sucesso!")
+            if cliente_encontrado:  # Se o cliente foi encontrado
+                print("Cliente removido com sucesso!")  # Exibe mensagem de sucesso
             else:
                 print("Cliente não encontrado.")
 
     def listarClientes(self, arquivo: str) -> List['Cliente']:
-        clientes = []
-        with open(arquivo, "r") as f:
-            for line in f:
-                if not line.strip():
-                    continue
-                parts = line.strip().split(';')
-                cliente = Cliente(parts[0], parts[1], parts[2], float(parts[3]), parts[4])
-                clientes.append(cliente)
-        return clientes
+        clientes = []  # Lista de clientes
+        with open(arquivo, "r") as f:  # Abre o arquivo em modo leitura
+            for line in f:  # Percorre as linhas do arquivo
+                if not line.strip():  # Se a linha não estiver vazia
+                    continue  # Sai do laço
+                parts = line.strip().split(";")  # Divide as linhas em partes
+                cliente = Cliente(parts[0], parts[1], parts[2], float(parts[3]), parts[4])  # Cria um cliente
+                clientes.append(cliente)  # Adiciona o cliente na lista de clientes
+        return clientes  # Retorna a lista de clientes
 
     def verificaCNPJ(self, arquivo: str) -> bool:
-        with open(arquivo, "r") as f:
-            lines = f.readlines()
+        with open(arquivo, "r") as f:  # Abre o arquivo em modo leitura
+            lines = f.readlines()  # Pega todas as linhas do arquivo
 
-        for line in lines:
-            if line.split(";")[1] == self.cnpj:
-                return True
+        for line in lines:  # Percorre as linhas do arquivo
+            if line.split(";")[1] == self.cnpj:  # Se o CNPJ da linha for igual ao do cliente
+                return True  # Retorna True
 
         return False
 
     def verificaSenha(self, arquivo: str, senha: str) -> bool:
-        with open(arquivo, "r") as f:
-            lines = f.readlines()
+        with open(arquivo, "r") as f:  # Abre o arquivo em modo leitura
+            lines = f.readlines()  # Pega todas as linhas do arquivo
 
         for line in lines:
-            partes = line.strip().split(";")
-            if partes[1] == self.cnpj and partes[4] == senha:
-                return True
+            partes = line.strip().split(";")  # Divide as linhas em partes, utiliza strip para remover os espaços
+            if partes[1] == self.cnpj and partes[
+                4] == senha:  # Se o CNPJ da linha for igual ao do cliente e a senha for igual a informada
+                return True  # Retorna True
 
         return False
 
     def debito(self, arquivo: str, valor: float, registro: bool = True, taxa: bool = True) -> bool:
-        saldo = self.getSaldo(arquivo)
+        saldo = self.getSaldo(arquivo)  # Pega o saldo do cliente
 
-        if self.getTipoDeConta(arquivo) == "comum":
-            valor = valor + valor * 0.05 if taxa else valor
-            saldo -= valor
-            if saldo < -1000:
-                return False
-        if self.getTipoDeConta(arquivo) == "plus":
-            valor = valor + valor * 0.03 if taxa else valor
-            saldo -= valor
-            if saldo < -5000:
-                return False
+        if self.getTipoDeConta(arquivo) == "comum":  # Se o tipo de conta for comum
+            valor = valor + valor * 0.05 if taxa else valor  # Calcula o valor com taxa se taxa = True
+            saldo -= valor  # Subtrai o valor do saldo do cliente
+            if saldo < -1000:  # Se o saldo for menor que -1000
+                return False  # Retorna False
 
-        if self.setSaldo(arquivo, saldo):
-            if registro:
-                self.registrarOperacao("debito", valor, self.cnpj)
-            return True
+        if self.getTipoDeConta(arquivo) == "plus":  # Se o tipo de conta for plus
+            valor = valor + valor * 0.07 if taxa else valor  # Calcula o valor com taxa se taxa = True
+            saldo -= valor  # Subtrai o valor do saldo do cliente
+            if saldo < -5000:  # Se o saldo for menor que -5000
+                return False  # Retorna False
+
+        if self.setSaldo(arquivo, saldo):  # Se o saldo for alterado com sucesso
+            if registro:  # Se registro = True
+                self.registrarOperacao("debito", valor, self.cnpj)  # Registra a operação no arquivo de operaçãe
+            return True  # Retorna True
         return False
 
     def deposito(self, arquivo: str, valor: float, registro: bool = True) -> bool:
-        saldo = self.getSaldo(arquivo)
-        saldo += valor
+        saldo = self.getSaldo(arquivo)  # Pega o saldo do cliente
+        saldo += valor  # Soma o valor ao saldo do cliente
 
-        if self.setSaldo(arquivo, saldo):
-            if registro:
-                self.registrarOperacao("deposito", valor, self.cnpj)
-            return True
-
+        if self.setSaldo(arquivo, saldo):  # Se o saldo for alterado com sucesso
+            if registro:  # Se registro = True
+                self.registrarOperacao("deposito", valor, self.cnpj)  # Registra a operação no arquivo de operaçãe
+            return True  # Retorna True
         return False
 
     def transferencia(self, arquivo: str, cnpj_destino: str, valor: float) -> bool:
-        cnpj_origem = self.cnpj
-        if self.debito(arquivo, valor, registro=False, taxa=False):
-            self.registrarOperacao(f"Transf. para {cnpj_destino}", valor,  cnpj_origem)
-            for cliente in self.listarClientes(arquivo):
-                if cliente.cnpj == cnpj_destino:
-                    if cliente.deposito(arquivo, valor, registro=False):
-                        self.registrarOperacao(f"Transf. de {cnpj_origem}", valor, cnpj_destino)
-                        return True
-                    else:
-                        self.deposito(arquivo, valor, registro=False)
-                        return False
+        cnpj_origem = self.cnpj  # Obtém o CNPJ do cliente
+        if self.debito(arquivo, valor, registro=False, taxa=False):  # Se o cliente debitar o valor com sucesso
+            self.registrarOperacao(f"Transf. para {cnpj_destino}", valor,
+                                   cnpj_origem)  # Registra a operação no arquivo de operaçãe
+            for cliente in self.listarClientes(arquivo):  # Percorre a lista de clientes
+                if cliente.cnpj == cnpj_destino:  # Se o CNPJ do cliente for igual ao do destino
+                    if cliente.deposito(arquivo, valor, registro=False):  # Se o cliente depositar o valor com sucesso
+                        self.registrarOperacao(f"Transf. de {cnpj_origem}", valor,
+                                               cnpj_destino)  # Registra a operação no arquivo de operaçãe
+                        return True  # Retorna True
+                    else:  # Se o cliente não depositar o valor com sucesso
+                        self.deposito(arquivo, valor, registro=False)  # Retorna o saldo do cliente
+                        return False  # Retorna False
 
         return False
 
     def registrarOperacao(self, tipoOperacao: str, valor: float, cnpj: str):
-        # Obter data e hora atuais
-        dataHora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        dataHora = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Obtem data e hora atuais
 
-        # Adicionar a operação ao arquivo de operações
-        with open("operacoes.txt", "a") as arquivo:
-            # Escrever informações no formato cnpj;data_hora;tipo_de_operacao;valor
-            arquivo.write(f"{cnpj};{dataHora};{tipoOperacao};{valor}\n")
+        with open("operacoes.txt", "a") as arquivo:  # Adiciona a operação ao arquivo de operações
+
+            arquivo.write(
+                f"{cnpj};{dataHora};{tipoOperacao};{valor}\n")  # Escreve informações no formato cnpj;data_hora;tipo_de_operacao;valor
 
     def exibirOperacoes(self):
-        with open("operacoes.txt", "r") as arquivo:
-            for line in arquivo:
-                if line.split(";")[0] == self.cnpj:
-                    print(f"{line.split(';')[1]} :"
-                          f"\t{line.split(';')[2].ljust(20)} -> "
-                          f"R${line.split(';')[3]}")
+        with open("operacoes.txt", "r") as arquivo:  # Abre o arquivo em modo leitura
+            for line in arquivo:  # Percorre as linhas do arquivo
+                if not line.strip():  # Se a linha não estiver vazia
+                    continue  # Sai do laço
+                if line.split(";")[0] == self.cnpj:  # Se o CNPJ da linha for igual ao do cliente
+                    print(f"{line.split(';')[1]} :"  # Exibe a data e hora
+                          f"\t{line.split(';')[2].ljust(20)} -> "  # Exibe o tipo de operação, usa ljust para alinhar
+                          f"R${line.split(';')[3]}")  # Exibe a operação
 
     def __str__(self):
         return (
