@@ -1,0 +1,2 @@
+hazime;1234;comum;2609.5;12
+guimaraes;789;plus;5000.0;123456789
